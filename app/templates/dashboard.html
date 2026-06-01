@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — Wholesale Clothing ERP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0c10;
+        --surface: #111318;
+        --surface2: #1a1d26;
+        --surface3: #22263a;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-active: rgba(99, 102, 241, 0.5);
+        --text: #e8eaf0;
+        --text-muted: #6b7280;
+        --text-dim: #9ca3af;
+        --primary: #6366f1;
+        --primary-hover: #4f52e0;
+        --primary-glow: rgba(99, 102, 241, 0.2);
+        --success: #10b981;
+        --success-bg: rgba(16, 185, 129, 0.1);
+        --warning: #f59e0b;
+        --warning-bg: rgba(245, 158, 11, 0.1);
+        --danger: #ef4444;
+        --danger-bg: rgba(239, 68, 68, 0.1);
+        --sidebar-w: 260px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        min-height: 100vh;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+      }
+      .sidebar-brand {
+        padding: 22px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), #818cf8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .brand-name {
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .brand-sub {
+        font-size: 10px;
+        color: var(--text-muted);
+        font-weight: 500;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-top: 1px;
+      }
+      .sidebar-nav {
+        padding: 14px 12px;
+        flex: 1;
+      }
+      .nav-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 0 8px;
+        margin: 14px 0 5px;
+      }
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        color: var(--text-dim);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13.5px;
+        transition: all 0.15s;
+        margin-bottom: 2px;
+      }
+      .nav-link:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .nav-link.active {
+        background: var(--primary-glow);
+        color: var(--primary);
+        font-weight: 600;
+      }
+      .nav-link svg {
+        width: 16px;
+        height: 16px;
+        opacity: 0.8;
+        flex-shrink: 0;
+      }
+      .sidebar-footer {
+        padding: 14px 12px;
+        border-top: 1px solid var(--border);
+      }
+      .logout-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        color: var(--danger);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 500;
+        transition: background 0.15s;
+      }
+      .logout-link:hover {
+        background: var(--danger-bg);
+      }
+      .logout-link svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* MAIN */
+      .main {
+        margin-left: var(--sidebar-w);
+        min-height: 100vh;
+      }
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 28px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .topbar-left h1 {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .topbar-left p {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .topbar-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--success-bg);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--success);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .content {
+        padding: 28px;
+      }
+
+      /* STAT GRID */
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+        animation: fadeUp 0.4s ease both;
+      }
+      .stat-card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .stat-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .stat-card:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .stat-card:hover {
+        border-color: var(--border-active);
+        transform: translateY(-2px);
+      }
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        opacity: 0.08;
+      }
+      .stat-card.indigo::after {
+        background: var(--primary);
+      }
+      .stat-card.green::after {
+        background: var(--success);
+      }
+      .stat-card.amber::after {
+        background: var(--warning);
+      }
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-bottom: 14px;
+      }
+      .stat-card.indigo .stat-icon {
+        background: var(--primary-glow);
+      }
+      .stat-card.green .stat-icon {
+        background: var(--success-bg);
+      }
+      .stat-card.amber .stat-icon {
+        background: var(--warning-bg);
+      }
+      .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .stat-value {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .stat-card.indigo .stat-value {
+        color: #818cf8;
+      }
+      .stat-card.green .stat-value {
+        color: var(--success);
+      }
+      .stat-card.amber .stat-value {
+        color: var(--warning);
+      }
+      .stat-footer {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      /* SECTION GRID */
+      .section-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        animation: fadeUp 0.4s ease both;
+        animation-delay: 0.25s;
+      }
+      .card-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .card-title {
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card-body {
+        padding: 20px;
+      }
+
+      /* QUICK NAV */
+      .quick-nav {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .quick-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        text-decoration: none;
+        color: var(--text);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .quick-card:hover {
+        border-color: var(--border-active);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+      }
+      .qc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+      .qc-icon.indigo {
+        background: var(--primary-glow);
+      }
+      .qc-icon.green {
+        background: var(--success-bg);
+      }
+      .qc-icon.amber {
+        background: var(--warning-bg);
+      }
+      .qc-label {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .qc-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      /* ACTIVITY */
+      .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .activity-item:last-child {
+        border-bottom: none;
+      }
+      .activity-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 6px;
+        flex-shrink: 0;
+      }
+      .activity-dot.indigo {
+        background: var(--primary);
+      }
+      .activity-dot.green {
+        background: var(--success);
+      }
+      .activity-dot.amber {
+        background: var(--warning);
+      }
+      .activity-text {
+        font-size: 13px;
+        color: var(--text-dim);
+      }
+      .activity-text strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .activity-time {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <div class="brand-icon">🧵</div>
+          <div>
+            <div class="brand-name">WholesaleMS</div>
+            <div class="brand-sub">ERP · CRM · WMS</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <a href="/dashboard" class="nav-link active">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </a>
+
+        <div class="nav-label">Modules</div>
+        <a href="/products" class="nav-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+            />
+          </svg>
+          ERP — Products
+        </a>
+        <a href="/customers" class="nav-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          CRM — Customers
+        </a>
+        <a href="/warehouse" class="nav-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          WMS — Warehouse
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/logout" class="logout-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1>Dashboard</h1>
+          <p>Wholesale Clothing Management Overview</p>
+        </div>
+        <div class="topbar-badge">
+          <div class="status-dot"></div>
+          All Systems Operational
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- STAT CARDS -->
+        <div class="stat-grid">
+          <div class="stat-card indigo">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value">{{ total_products }}</div>
+            <div class="stat-footer">ERP catalogue entries</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Total Customers</div>
+            <div class="stat-value">{{ total_customers }}</div>
+            <div class="stat-footer">CRM contacts</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-icon">🏭</div>
+            <div class="stat-label">Warehouse Items</div>
+            <div class="stat-value">{{ total_warehouse }}</div>
+            <div class="stat-footer">WMS stock entries</div>
+          </div>
+        </div>
+
+        <!-- QUICK NAV -->
+        <div class="card" style="margin-bottom: 16px">
+          <div class="card-header">
+            <div class="card-title">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+              Quick Access
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="quick-nav">
+              <a href="/products" class="quick-card">
+                <div class="qc-icon indigo">📦</div>
+                <div>
+                  <div class="qc-label">ERP — Products</div>
+                  <div class="qc-desc">Manage product catalogue & stock</div>
+                </div>
+              </a>
+              <a href="/customers" class="quick-card">
+                <div class="qc-icon green">👥</div>
+                <div>
+                  <div class="qc-label">CRM — Customers</div>
+                  <div class="qc-desc">View & manage customer contacts</div>
+                </div>
+              </a>
+              <a href="/warehouse" class="quick-card">
+                <div class="qc-icon amber">🏭</div>
+                <div>
+                  <div class="qc-label">WMS — Warehouse</div>
+                  <div class="qc-desc">Track storage & inventory</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY SECTION -->
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Recent Activity
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-dot indigo"></div>
+                  <div>
+                    <div class="activity-text">
+                      <strong>ERP Module</strong> — Product catalogue ready
+                    </div>
+                    <div class="activity-time">View all products</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot green"></div>
+                  <div>
+                    <div class="activity-text">
+                      <strong>CRM Module</strong> — Customer records active
+                    </div>
+                    <div class="activity-time">View all customers</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot amber"></div>
+                  <div>
+                    <div class="activity-text">
+                      <strong>WMS Module</strong> — Warehouse tracking live
+                    </div>
+                    <div class="activity-time">View warehouse</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                System Status
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-dot green"></div>
+                  <div>
+                    <div class="activity-text">
+                      <strong>Database</strong> — Connected
+                    </div>
+                    <div class="activity-time">SQLite operational</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot green"></div>
+                  <div>
+                    <div class="activity-text">
+                      <strong>API Server</strong> — Running
+                    </div>
+                    <div class="activity-time">FastAPI backend active</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot green"></div>
+                  <div>
+                    <div class="activity-text">
+                      <strong>Session</strong> — Authenticated
+                    </div>
+                    <div class="activity-time">Secure login active</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
