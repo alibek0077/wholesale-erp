@@ -23,5 +23,10 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-            cd /home/ubuntu
-            ls
+            cd /home/ubuntu/wholesale-erp
+
+            git reset --hard
+            git pull origin main
+
+            docker compose down
+            docker compose up -d --build
