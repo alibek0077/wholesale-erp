@@ -1,4 +1,4 @@
-```yaml id="r9vh3e"
+```yaml
 name: Deploy ERP System
 
 on:
@@ -21,8 +21,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
-
           script: |
             cd /home/ubuntu/wholesale-erp
             git pull origin main
 ```
+
