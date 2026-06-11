@@ -1,218 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Warehouse — WMS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root{--bg:#0a0c10;--surface:#111318;--surface2:#1a1d26;--surface3:#22263a;--border:rgba(255,255,255,0.07);--border-active:rgba(245,158,11,0.4);--text:#e8eaf0;--text-muted:#6b7280;--text-dim:#9ca3af;--primary:#6366f1;--primary-glow:rgba(99,102,241,0.2);--success:#10b981;--success-bg:rgba(16,185,129,0.1);--warning:#f59e0b;--warning-bg:rgba(245,158,11,0.1);--danger:#ef4444;--danger-bg:rgba(239,68,68,0.1);--sidebar-w:260px;}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
-    .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;}
-    .sidebar-brand{padding:22px 20px;border-bottom:1px solid var(--border);}
-    .brand-logo{display:flex;align-items:center;gap:10px;}
-    .brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#818cf8);display:flex;align-items:center;justify-content:center;font-size:16px;}
-    .brand-name{font-size:14px;font-weight:800;letter-spacing:-0.3px;}
-    .brand-sub{font-size:10px;color:var(--text-muted);font-weight:500;letter-spacing:.8px;text-transform:uppercase;margin-top:1px;}
-    .sidebar-nav{padding:14px 12px;flex:1;}
-    .nav-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);padding:0 8px;margin:14px 0 5px;}
-    .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--text-dim);text-decoration:none;font-weight:500;font-size:13.5px;transition:all .15s;margin-bottom:2px;}
-    .nav-link:hover{background:var(--surface2);color:var(--text);}
-    .nav-link.active{background:var(--warning-bg);color:var(--warning);font-weight:600;}
-    .nav-link svg{width:16px;height:16px;opacity:.8;flex-shrink:0;}
-    .sidebar-footer{padding:14px 12px;border-top:1px solid var(--border);}
-    .logout-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;color:var(--danger);text-decoration:none;font-size:13.5px;font-weight:500;transition:background .15s;}
-    .logout-link:hover{background:var(--danger-bg);}
-    .logout-link svg{width:16px;height:16px;}
-    .main{margin-left:var(--sidebar-w);min-height:100vh;}
-    .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-    .topbar-left h1{font-size:15px;font-weight:700;}
-    .topbar-left p{font-size:12px;color:var(--text-muted);}
-    .content{padding:28px;}
-    .add-form-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:20px;overflow:hidden;animation:fadeUp .4s ease both;}
-    .form-card-header{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;}
-    .form-card-body{padding:18px 20px;}
-    .form-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;}
-    .form-group{flex:1;min-width:140px;}
-    .form-label{display:block;margin-bottom:6px;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;}
-    .form-control{width:100%;padding:9px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13.5px;font-family:inherit;transition:border-color .15s,box-shadow .15s;outline:none;}
-    .form-control::placeholder{color:var(--text-muted);}
-    .form-control:focus{border-color:var(--warning);box-shadow:0 0 0 3px var(--warning-bg);}
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .15s;white-space:nowrap;font-family:inherit;}
-    .btn-amber{background:var(--warning);color:#0a0c10;}
-    .btn-amber:hover{background:#e08e00;box-shadow:0 0 0 3px var(--warning-bg);}
-    .btn-warning{background:var(--warning-bg);color:var(--warning);border:1px solid rgba(245,158,11,.25);}
-    .btn-warning:hover{background:rgba(245,158,11,.2);}
-    .btn-danger{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
-    .btn-danger:hover{background:rgba(239,68,68,.2);}
-    .btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border);}
-    .btn-ghost:hover{background:var(--surface2);color:var(--text);}
-    .btn-sm{padding:5px 10px;font-size:12px;border-radius:6px;}
-    .table-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .4s ease both;animation-delay:.1s;}
-    .table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-    .table-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;}
-    .count-badge{background:var(--warning-bg);color:var(--warning);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;}
-    .data-table{width:100%;border-collapse:collapse;}
-    .data-table thead tr{background:var(--surface2);border-bottom:1px solid var(--border);}
-    .data-table thead th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;}
-    .data-table tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
-    .data-table tbody tr:last-child{border-bottom:none;}
-    .data-table tbody tr:hover{background:var(--surface2);}
-    .data-table tbody td{padding:12px 16px;font-size:13.5px;color:var(--text-dim);}
-    .data-table tbody td.id-col{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);}
-    .data-table tbody td.main-col{color:var(--text);font-weight:600;}
-    .data-table .actions{display:flex;gap:6px;}
-    .location-badge{display:inline-flex;align-items:center;gap:5px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
-    .stock-badge{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;padding:2px 10px;border-radius:20px;}
-    .stock-low{background:var(--danger-bg);color:var(--danger);}
-    .stock-mid{background:var(--warning-bg);color:var(--warning);}
-    .stock-ok{background:var(--success-bg);color:var(--success);}
-    .empty-state{padding:48px;text-align:center;color:var(--text-muted);}
-    .empty-icon{font-size:36px;margin-bottom:12px;}
-    .empty-title{font-size:15px;font-weight:700;color:var(--text-dim);margin-bottom:4px;}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-  </style>
-</head>
-<body>
-
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <div class="brand-logo">
-      <div class="brand-icon">🧵</div>
-      <div><div class="brand-name">WholesaleMS</div><div class="brand-sub">ERP · CRM · WMS</div></div>
-    </div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-label">Main</div>
-    <a href="/dashboard" class="nav-link">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Dashboard
-    </a>
-    <div class="nav-label">Modules</div>
-    <a href="/products" class="nav-link">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      Products
-    </a>
-    <a href="/customers" class="nav-link">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      CRM — Customers
-    </a>
-    <a href="/warehouse" class="nav-link active">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      WMS — Warehouse
-    </a>
-  </nav>
-  <div class="sidebar-footer">
-    <a href="/logout" class="logout-link">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign Out
-    </a>
-  </div>
-</aside>
-
-<div class="main">
-  <header class="topbar">
-    <div class="topbar-left">
-      <h1>Warehouse Management</h1>
-      <p>WMS — Warehouse Management System</p>
-    </div>
-    <a href="/dashboard" class="btn btn-ghost" style="font-size:12px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      Dashboard
-    </a>
-  </header>
-
-  <div class="content">
-
-    <div class="add-form-card">
-      <div class="form-card-header">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Add Warehouse Item
-      </div>
-      <div class="form-card-body">
-        <form method="POST" action="/warehouse/add">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Product Name</label>
-              <input type="text" name="product" class="form-control" placeholder="e.g. Men's Polo Shirt" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Storage Location</label>
-              <input type="text" name="location" class="form-control" placeholder="e.g. Shelf A-12, Row B" required>
-            </div>
-            <div class="form-group" style="max-width:130px;">
-              <label class="form-label">Stock Qty</label>
-              <input type="number" name="stock" class="form-control" placeholder="0" min="0" required>
-            </div>
-            <button type="submit" class="btn btn-amber" style="flex-shrink:0;height:38px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add Item
-            </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Warehouse — WMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0c10;
+        --surface: #111318;
+        --surface2: #1a1d26;
+        --surface3: #22263a;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-active: rgba(245, 158, 11, 0.4);
+        --text: #e8eaf0;
+        --text-muted: #6b7280;
+        --text-dim: #9ca3af;
+        --primary: #6366f1;
+        --primary-glow: rgba(99, 102, 241, 0.2);
+        --success: #10b981;
+        --success-bg: rgba(16, 185, 129, 0.1);
+        --warning: #f59e0b;
+        --warning-bg: rgba(245, 158, 11, 0.1);
+        --danger: #ef4444;
+        --danger-bg: rgba(239, 68, 68, 0.1);
+        --sidebar-w: 260px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        min-height: 100vh;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+      }
+      .sidebar-brand {
+        padding: 22px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), #818cf8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .brand-name {
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .brand-sub {
+        font-size: 10px;
+        color: var(--text-muted);
+        font-weight: 500;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-top: 1px;
+      }
+      .sidebar-nav {
+        padding: 14px 12px;
+        flex: 1;
+      }
+      .nav-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 0 8px;
+        margin: 14px 0 5px;
+      }
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        color: var(--text-dim);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13.5px;
+        transition: all 0.15s;
+        margin-bottom: 2px;
+      }
+      .nav-link:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .nav-link.active {
+        background: var(--warning-bg);
+        color: var(--warning);
+        font-weight: 600;
+      }
+      .nav-link svg {
+        width: 16px;
+        height: 16px;
+        opacity: 0.8;
+        flex-shrink: 0;
+      }
+      .sidebar-footer {
+        padding: 14px 12px;
+        border-top: 1px solid var(--border);
+      }
+      .logout-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        color: var(--danger);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 500;
+        transition: background 0.15s;
+      }
+      .logout-link:hover {
+        background: var(--danger-bg);
+      }
+      .logout-link svg {
+        width: 16px;
+        height: 16px;
+      }
+      .main {
+        margin-left: var(--sidebar-w);
+        min-height: 100vh;
+      }
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 28px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .topbar-left h1 {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .topbar-left p {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .content {
+        padding: 28px;
+      }
+      .add-form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        animation: fadeUp 0.4s ease both;
+      }
+      .form-card-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .form-card-body {
+        padding: 18px 20px;
+      }
+      .form-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .form-group {
+        flex: 1;
+        min-width: 140px;
+      }
+      .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+      .form-control {
+        width: 100%;
+        padding: 9px 13px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 13.5px;
+        font-family: inherit;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        outline: none;
+      }
+      .form-control::placeholder {
+        color: var(--text-muted);
+      }
+      .form-control:focus {
+        border-color: var(--warning);
+        box-shadow: 0 0 0 3px var(--warning-bg);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        transition: all 0.15s;
+        white-space: nowrap;
+        font-family: inherit;
+      }
+      .btn-amber {
+        background: var(--warning);
+        color: #0a0c10;
+      }
+      .btn-amber:hover {
+        background: #e08e00;
+        box-shadow: 0 0 0 3px var(--warning-bg);
+      }
+      .btn-warning {
+        background: var(--warning-bg);
+        color: var(--warning);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+      }
+      .btn-warning:hover {
+        background: rgba(245, 158, 11, 0.2);
+      }
+      .btn-danger {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+      .btn-danger:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-dim);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 6px;
+      }
+      .table-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        animation: fadeUp 0.4s ease both;
+        animation-delay: 0.1s;
+      }
+      .table-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .table-title {
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .count-badge {
+        background: var(--warning-bg);
+        color: var(--warning);
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .data-table thead tr {
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+      }
+      .data-table thead th {
+        padding: 11px 16px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+      }
+      .data-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.1s;
+      }
+      .data-table tbody tr:last-child {
+        border-bottom: none;
+      }
+      .data-table tbody tr:hover {
+        background: var(--surface2);
+      }
+      .data-table tbody td {
+        padding: 12px 16px;
+        font-size: 13.5px;
+        color: var(--text-dim);
+      }
+      .data-table tbody td.id-col {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .data-table tbody td.main-col {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .data-table .actions {
+        display: flex;
+        gap: 6px;
+      }
+      .location-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--surface3);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 3px 10px;
+        font-size: 12px;
+        color: var(--text-dim);
+        font-family: "JetBrains Mono", monospace;
+      }
+      .stock-badge {
+        display: inline-flex;
+        align-items: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 2px 10px;
+        border-radius: 20px;
+      }
+      .stock-low {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+      .stock-mid {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      .stock-ok {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .empty-state {
+        padding: 48px;
+        text-align: center;
+        color: var(--text-muted);
+      }
+      .empty-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+      }
+      .empty-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-dim);
+        margin-bottom: 4px;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <div class="brand-icon">🧵</div>
+          <div>
+            <div class="brand-name">WholesaleERP</div>
+            <div class="brand-sub">ERP</div>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Warehouse Inventory
         </div>
-        <span class="count-badge">{{ warehouse_items | length }} entries</span>
       </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <a href="/dashboard" class="nav-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </a>
+        <div class="nav-label">Modules</div>
+        <a href="/products" class="nav-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+            />
+          </svg>
+          Products
+        </a>
+        <a href="/customers" class="nav-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          Customers
+        </a>
+        <a href="/warehouse" class="nav-link active">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Warehouse
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/logout" class="logout-link">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sign Out
+        </a>
+      </div>
+    </aside>
 
-      {% if warehouse_items %}
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Product</th>
-            <th>Location</th>
-            <th>Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in warehouse_items %}
-          <tr>
-            <td class="id-col">#{{ item.id }}</td>
-            <td class="main-col">{{ item.product }}</td>
-            <td><span class="location-badge">📍 {{ item.location }}</span></td>
-            <td>
-              <span class="stock-badge {% if item.stock < 10 %}stock-low{% elif item.stock < 50 %}stock-mid{% else %}stock-ok{% endif %}">
-                {{ item.stock }} units
-              </span>
-            </td>
-            <td>
-              <div class="actions">
-                <a href="/warehouse/edit/{{ item.id }}" class="btn btn-warning btn-sm">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  Edit
-                </a>
-                <a href="/warehouse/delete/{{ item.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this item?')">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                  Delete
-                </a>
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1>Warehouse Management</h1>
+          <p>WMS — Warehouse Management System</p>
+        </div>
+        <a href="/dashboard" class="btn btn-ghost" style="font-size: 12px">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M19 12H5M12 5l-7 7 7 7" />
+          </svg>
+          Dashboard
+        </a>
+      </header>
+
+      <div class="content">
+        <div class="add-form-card">
+          <div class="form-card-header">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--warning)"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            Add Warehouse Item
+          </div>
+          <div class="form-card-body">
+            <form method="POST" action="/warehouse/add">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Product Name</label>
+                  <input
+                    type="text"
+                    name="product"
+                    class="form-control"
+                    placeholder="e.g. Men's Polo Shirt"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Storage Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    class="form-control"
+                    placeholder="e.g. Shelf A-12, Row B"
+                    required
+                  />
+                </div>
+                <div class="form-group" style="max-width: 130px">
+                  <label class="form-label">Stock Qty</label>
+                  <input
+                    type="number"
+                    name="stock"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="btn btn-amber"
+                  style="flex-shrink: 0; height: 38px"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Item
+                </button>
               </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <div class="empty-state">
-        <div class="empty-icon">🏭</div>
-        <div class="empty-title">Warehouse is empty</div>
-        <div>Add your first item using the form above</div>
+            </form>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              Warehouse Inventory
+            </div>
+            <span class="count-badge"
+              >{{ warehouse_items | length }} entries</span
+            >
+          </div>
+
+          {% if warehouse_items %}
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in warehouse_items %}
+              <tr>
+                <td class="id-col">#{{ item.id }}</td>
+                <td class="main-col">{{ item.product }}</td>
+                <td>
+                  <span class="location-badge">📍 {{ item.location }}</span>
+                </td>
+                <td>
+                  <span
+                    class="stock-badge {% if item.stock < 10 %}stock-low{% elif item.stock < 50 %}stock-mid{% else %}stock-ok{% endif %}"
+                  >
+                    {{ item.stock }} units
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <a
+                      href="/warehouse/edit/{{ item.id }}"
+                      class="btn btn-warning btn-sm"
+                    >
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                        />
+                        <path
+                          d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                        />
+                      </svg>
+                      Edit
+                    </a>
+                    <a
+                      href="/warehouse/delete/{{ item.id }}"
+                      class="btn btn-danger btn-sm"
+                      onclick="return confirm('Delete this item?')"
+                    >
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                        <path d="M9 6V4h6v2" />
+                      </svg>
+                      Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">🏭</div>
+            <div class="empty-title">Warehouse is empty</div>
+            <div>Add your first item using the form above</div>
+          </div>
+          {% endif %}
+        </div>
       </div>
-      {% endif %}
-
     </div>
-  </div>
-</div>
-
-</body>
+  </body>
 </html>
