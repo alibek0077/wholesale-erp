@@ -1,4 +1,3 @@
-```yaml id="xqj4pk"
 name: Deploy ERP System
 
 on:
@@ -26,6 +25,3 @@ jobs:
           script: |
             cd /home/ubuntu
             ls
-```
-
-
