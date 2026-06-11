@@ -1,12 +1,12 @@
 name: Deploy ERP System
 
-on: push
+on:
+push:
 
 jobs:
 deploy:
 runs-on: ubuntu-latest
 
-```
 steps:
   - name: Checkout source code
     uses: actions/checkout@v4
@@ -21,4 +21,4 @@ steps:
       script: |
         cd /home/ubuntu
         ls
-```
+
