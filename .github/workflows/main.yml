@@ -27,3 +27,7 @@ jobs:
 
             git reset --hard
             git pull origin main
+
+            sudo pkill -f uvicorn
+
+            nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
