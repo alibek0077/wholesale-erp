@@ -61,9 +61,9 @@ async def login(
         )
 
     return templates.TemplateResponse(
-        "login.html",
-        {
-            "request": request,
+        request=request,
+        name="login.html",
+        context={
             "error": "Invalid username or password"
         }
     )
