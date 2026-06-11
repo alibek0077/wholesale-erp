@@ -1,3 +1,4 @@
+```yaml id="xqj4pk"
 name: Deploy ERP System
 
 on:
@@ -15,12 +16,16 @@ jobs:
 
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v1.0.3
+
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
+
           script: |
-            cd /home/ubuntu/wholesale-erp
-            git pull origin main
+            cd /home/ubuntu
+            ls
+```
+
 
