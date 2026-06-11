@@ -25,4 +25,3 @@ jobs:
             cd /home/ubuntu/wholesale-erp
             git pull origin main
 ```
-
