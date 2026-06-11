@@ -3,20 +3,22 @@ name: Deploy ERP System
 on: push
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+deploy:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
+```
+steps:
+  - name: Checkout source code
+    uses: actions/checkout@v4
 
-      - name: Deploy to AWS EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            cd /home/ubuntu
-            ls
+  - name: Deploy to AWS EC2
+    uses: appleboy/ssh-action@v1.0.3
+    with:
+      host: ${{ secrets.HOST }}
+      username: ${{ secrets.USERNAME }}
+      key: ${{ secrets.SSH_KEY }}
+      port: ${{ secrets.PORT }}
+      script: |
+        cd /home/ubuntu
+        ls
+```
