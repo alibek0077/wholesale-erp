@@ -26,15 +26,12 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 templates = Jinja2Templates(directory="app/templates")
 
-
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def login_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={
-            "error": None
-        }
+        context={"error": None}
     )
 
 
@@ -70,10 +67,10 @@ async def login(
             "error": "Invalid username or password"
         }
     )
-
-
 @app.get("/dashboard")
 async def dashboard(request: Request):
+
+    print("SESSION =", request.session)
 
     if "user" not in request.session:
         return RedirectResponse("/", status_code=303)
@@ -95,7 +92,6 @@ async def dashboard(request: Request):
             "total_warehouse": total_warehouse
         }
     )
-
 
 @app.get("/health")
 async def health():
