@@ -1,3 +1,4 @@
+```yaml
 name: Deploy ERP System
 
 on:
@@ -23,5 +24,9 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-            cd /home/ubuntu
-            ls
+            cd /home/ubuntu/wholesale-erp
+
+            git pull origin main
+
+            sudo systemctl restart nginx
+```
