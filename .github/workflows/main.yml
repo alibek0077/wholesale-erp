@@ -1,4 +1,4 @@
-```yaml id="ry33l2"
+```yaml id="r9vh3e"
 name: Deploy ERP System
 
 on:
@@ -16,7 +16,6 @@ jobs:
 
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v1.0.3
-
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
